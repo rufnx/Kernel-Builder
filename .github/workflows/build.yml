@@ -1,4 +1,4 @@
-name: Build Kernel
+name: Build Kernel r5x
 on:
   workflow_dispatch:
     inputs:
