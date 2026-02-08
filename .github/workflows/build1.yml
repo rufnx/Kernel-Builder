@@ -6,6 +6,14 @@ on:
         description: Kernel branch
         default: 'master'
         required: true
+      DEFCONFIG:
+        description: Kernel Defconfig
+        default: 'rufnx_defconfig'
+        required: false
+      KSU:
+        description: KernelSU Support
+        type: boolean
+        default: false
         
 jobs:
   build:
