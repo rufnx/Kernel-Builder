@@ -1,0 +1,60 @@
+name: Build Kernel a22x
+on:
+  workflow_dispatch:
+    inputs:
+      BRANCH:
+        description: Kernel branch
+        default: 'master'
+        required: true
+        
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    
+    - name: Get date
+      id: rundate
+      run: |
+        sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+        echo "REPO_DATE=`date`" >> $GITHUB_OUTPUT
+    
+    - uses: actions/checkout@v4
+      with:
+        path: kernel_root
+        repository: "${{ github.actor }}/android_kernel_samsung_a226b"
+        ref: ${{ inputs.BRANCH }}
+        show-progress: false
+        fetch-depth: 1
+        
+    - name: Prepare dependencies
+      run: |
+        sudo apt update -y
+        sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl wget aria2 curl lz4 -y
+        sudo aptitude install libssl-dev -y
+        
+    - name: Build Kernel
+      run: |
+        bash build.sh
+      working-directory: kernel_root
+
+    - name: Packing AnyKernel3
+      run: |
+        git clone --depth=1 https://github.com/rufnx/AnyKernel3.git -b a22x
+        cp out/arch/arm64/boot/Image.gz AnyKernel3
+      working-directory: kernel_root
+
+    - name: Check Linux Version
+      run: strings out/arch/arm64/boot/Image | grep "Linux version"
+        
+    - name: Upload Output
+      uses: actions/upload-artifact@v4
+      with:
+        name: ImageZip
+        path: kernel_root/out/arch/arm64/boot/*
+
+    - name: Upload AnyKernel3
+      uses: actions/upload-artifact@v4
+      with:
+        name: AnyKernel3-$REPO_DATE
+        path: kernel_root/AnyKernel3/*
+        compression-level: 9
