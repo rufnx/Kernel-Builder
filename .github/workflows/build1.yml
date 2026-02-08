@@ -44,7 +44,8 @@ jobs:
       working-directory: kernel_root
 
     - name: Check Linux Version
-      run: strings out/arch/arm64/boot/Image | grep "Linux version"
+      run: zcat Image.gz | strings | grep "Linux version"
+      working-directory: kernel_root/out/arch/arm64/boot
         
     - name: Upload Output
       uses: actions/upload-artifact@v4
