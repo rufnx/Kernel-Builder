@@ -1,0 +1,57 @@
+name: Build Kernel gki
+on:
+  workflow_dispatch:
+    inputs:
+      KSU:
+        description: KernelSU Support
+        type: boolean
+        default: false
+        
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    
+    - name: Get date
+      id: rundate
+      run: |
+        sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+        echo "REPO_DATE=`date`" >> $GITHUB_OUTPUT
+    
+    - uses: actions/checkout@v4
+      with:
+        show-progress: false
+        fetch-depth: 1
+        
+    - name: Prepare dependencies
+      run: |
+        sudo apt update -y
+        sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl wget repo curl lz4 -y
+        sudo aptitude install libssl-dev -y
+        mkdir common_dir
+        
+    - name: Build Kernel
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor }}@proton.me"
+        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android12-5.10
+        repo --trace sync -c -j$(nproc --all) --no-tags --fail-fast
+        if [ -d common ]; then
+            rm -rf common
+            git clone https://github.com/rufnx/android_kernel_common --depth=1 --single-branch -b nethunter-susfs common
+        fi
+        if [[ KSU == ${{ inputs.KSU }} ]]; then
+            curl -LSs https://raw.githubusercontent.com/pershot/KernelSU-Next/dev-susfs/kernel/setup.sh | bash -s
+        fi
+        LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh
+      working-directory: common_dir
+
+    - name: Check Linux Version
+      run: strings Image | grep "Linux version"
+      working-directory: common_dir/out/*/dist
+        
+    - name: Upload Output
+      uses: actions/upload-artifact@v4
+      with:
+        name: ImageZip
+        path: common_dir/out/*/dist/*
