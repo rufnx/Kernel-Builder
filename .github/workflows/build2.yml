@@ -40,7 +40,7 @@ jobs:
             rm -rf common
             git clone https://github.com/rufnx/android_kernel_common --depth=1 --single-branch -b nethunter-susfs common
         fi
-        if [[ KSU == ${{ inputs.KSU }} ]]; then
+        if [[ ${{ inputs.KSU }} == true ]]; then
             curl -LSs https://raw.githubusercontent.com/pershot/KernelSU-Next/dev-susfs/kernel/setup.sh | bash -s
         fi
         LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh
