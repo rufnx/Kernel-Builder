@@ -47,8 +47,9 @@ jobs:
       working-directory: common_dir
 
     - name: Check Linux Version
-      run: strings "Image" | grep "Linux version"
-      working-directory: common_dir/out/*/dist/
+      run: |
+        zcat out/*/dist/Image.gz | strings | grep "Linux version"
+      working-directory: common_dir
         
     - name: Upload Output
       uses: actions/upload-artifact@v4
