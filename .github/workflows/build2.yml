@@ -48,11 +48,11 @@ jobs:
 
     - name: Check Linux Version
       run: |
-        zcat out/*/dist/Image.gz | strings | grep "Linux version"
+        strings out/*/dist/Image | grep "Linux version"
       working-directory: common_dir
         
     - name: Upload Output
       uses: actions/upload-artifact@v4
       with:
         name: ImageZip
-        path: common_dir/out/*/dist/*
+        path: common_dir/out/*/dist/Image
