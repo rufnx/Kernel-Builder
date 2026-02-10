@@ -41,7 +41,7 @@ jobs:
             git clone https://github.com/rufnx/android_kernel_common --depth=1 --single-branch -b nethunter-susfs common
         fi
         if [[ ${{ inputs.KSU }} == true ]]; then
-            curl -LSs "https://raw.githubusercontent.com/pershoot/KernelSU-Next/next/kernel/setup.sh" | bash -s dev-susfs
+            curl -LSs "https://raw.githubusercontent.com/pershoot/KernelSU-Next/dev-susfs/kernel/setup.sh" | bash -s
         fi
         LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh
       working-directory: common_dir
