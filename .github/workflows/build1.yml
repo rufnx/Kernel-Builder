@@ -6,10 +6,6 @@ on:
         description: Kernel branch
         default: 'master'
         required: true
-      DEFCONFIG:
-        description: Kernel Defconfig
-        default: ''
-        required: false
       KSU:
         description: KernelSU Support
         type: boolean
@@ -39,7 +35,12 @@ jobs:
         sudo apt update -y
         sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl wget aria2 curl lz4 -y
         sudo aptitude install libssl-dev -y
-        
+
+    - name: Fetch KernelSU-Next
+      if: inputs.KSU == 'true'
+      run: curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s legacy
+      working-directory: kernel_root
+      
     - name: Build Kernel
       run: |
         export DEFCONFIG=${{ inputs.DEFCONFIG }}
