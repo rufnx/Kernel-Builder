@@ -36,13 +36,11 @@ jobs:
         sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl wget aria2 curl lz4 -y
         sudo aptitude install libssl-dev -y
 
-    - name: Fetch KernelSU-Next
-      if: inputs.KSU == 'true'
-      run: curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s legacy
-      working-directory: kernel_root
-      
     - name: Build Kernel
       run: |
+        if ! [[ ${{ inputs.KSU }} == true ]]; then
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s legacy
+        fi
         bash build.sh
       working-directory: kernel_root
 
