@@ -43,12 +43,7 @@ jobs:
       
     - name: Build Kernel
       run: |
-        export DEFCONFIG=${{ inputs.DEFCONFIG }}
-        if [[ ${{ inputs.KSU }} == true ]]; then
-            KSU=true bash build.sh
-        else
-            bash build.sh
-        fi
+        bash build.sh
       working-directory: kernel_root
 
     - name: Packing AnyKernel3
