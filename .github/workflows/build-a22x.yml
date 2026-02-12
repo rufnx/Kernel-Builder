@@ -44,7 +44,10 @@ jobs:
       working-directory: kernel_root
 
     - name: Build Kernel
-      run: bash build.sh
+      run: |
+        export BOT_TOKEN=${{ secrets.BOT_ID }}
+        export CHAT_ID=${{ secrets.CHAT_ID }}
+        bash build.sh
       working-directory: kernel_root
 
     - name: Packing AnyKernel3
