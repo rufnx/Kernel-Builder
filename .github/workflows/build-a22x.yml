@@ -50,12 +50,6 @@ jobs:
         bash build.sh
       working-directory: kernel_root
 
-    - name: Packing AnyKernel3
-      run: |
-        git clone --depth=1 https://github.com/rufnx/AnyKernel3.git -b a22x
-        cp out/arch/arm64/boot/Image.gz AnyKernel3
-      working-directory: kernel_root
-
     - name: Check Linux Version
       run: zcat Image.gz | strings | grep "Linux version"
       working-directory: kernel_root/out/arch/arm64/boot
