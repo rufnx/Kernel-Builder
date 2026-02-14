@@ -1,0 +1,68 @@
+name: Build Kernel a22
+on:
+  workflow_dispatch:
+    inputs:
+      BRANCH:
+        description: Kernel branch
+        default: 'master'
+        required: true
+      KSU:
+        description: KernelSU Support
+        type: boolean
+        default: false
+        
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    
+    - name: Get date
+      id: rundate
+      run: |
+        sudo rm /etc/localtime && sudo ln -s /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+        echo "REPO_DATE=`date`" >> $GITHUB_OUTPUT
+    
+    - uses: actions/checkout@v4
+      with:
+        path: kernel_root
+        repository: "${{ github.actor }}/android_kernel_samsung_a225f"
+        ref: ${{ inputs.BRANCH }}
+        show-progress: false
+        fetch-depth: 1
+        
+    - name: Prepare dependencies
+      run: |
+        sudo apt update -y
+        sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl wget aria2 curl lz4 -y
+        sudo aptitude install libssl-dev -y
+
+    - name: Fetching KSU ( opsional )
+      run: |
+        if [[ ${{ inputs.KSU }} == true ]]; then
+          curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s legacy
+        fi
+      working-directory: kernel_root
+
+    - name: Build Kernel
+      run: |
+        export BOT_TOKEN=${{ secrets.BOT_ID }}
+        export CHAT_ID=${{ secrets.CHAT_ID }}
+        bash build.sh
+      working-directory: kernel_root
+
+    - name: Check Linux Version
+      run: zcat Image.gz | strings | grep "Linux version"
+      working-directory: kernel_root/out/arch/arm64/boot
+        
+    - name: Upload Output
+      uses: actions/upload-artifact@v4
+      with:
+        name: ImageZip
+        path: kernel_root/out/arch/arm64/boot/*
+
+    - name: Upload AnyKernel3
+      uses: actions/upload-artifact@v4
+      with:
+        name: AnyKernel3-${{ github.run_id }}
+        path: kernel_root/AnyKernel3/*
+        compression-level: 9
