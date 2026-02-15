@@ -29,12 +29,6 @@ jobs:
         ref: ${{ inputs.BRANCH }}
         show-progress: false
         fetch-depth: 1
-        
-    - name: Prepare dependencies
-      run: |
-        sudo apt update -y
-        sudo apt install bc cpio flex bison aptitude git python-is-python3 tar perl wget aria2 curl lz4 -y
-        sudo aptitude install libssl-dev -y
 
     - name: Fetching KSU ( opsional )
       run: |
