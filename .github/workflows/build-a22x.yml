@@ -4,7 +4,7 @@ on:
     inputs:
       BRANCH:
         description: Kernel branch
-        default: 'master'
+        default: 'bpf-5.4'
         required: true
       KSU:
         description: KernelSU Support
@@ -64,5 +64,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: AnyKernel3-${{ github.run_id }}
-        path: kernel_root/AnyKernel3/*
-        compression-level: 9
+        path: kernel_root/out/zip/*.zip
